@@ -97,7 +97,8 @@ try:
             scan_button = card.find_element(
                 By.XPATH, ".//div[contains(@class, 'cursor-pointer')]")
 
-            scroll_to_element(driver, scan_button) # Ensure the button is in view
+            # Ensure the button is in view
+            scroll_to_element(driver, scan_button)
 
             # Debugging: Print scan button details
             print(f"Scan button displayed: {scan_button.is_displayed()}")
@@ -109,16 +110,38 @@ try:
             button = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((scan_button))
             )
-
-            # WebDriverWait(driver, 10).until(EC.element_to_be_clickable(scan_button))
-
-
             # Try clicking normally
             try:
                 scan_button.click()
             except ElementNotInteractableException:
                 print(f"Regular click failed. Trying JavaScript click...")
                 driver.execute_script("arguments[0].click();", button)
+
+            # Step 06: Locate and click the new button that appears after the scan button
+            try:
+                new_button = WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable(
+                        (By.XPATH, "//button[contains(@class, 'absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 bg-transparent rounded-none')]"))
+                )
+                # Ensure the button is in view
+                scroll_to_element(driver, new_button)
+
+                # Debugging: Print new button details
+                print(f"New button displayed: {new_button.is_displayed()}")
+                print(f"New button enabled: {new_button.is_enabled()}")
+                print(f"New button location: {new_button.location}")
+                print(f"New button size: {new_button.size}")
+
+                try:
+                    new_button.click()
+                except ElementNotInteractableException:
+                    print(f"Regular click failed. Trying JavaScript click...")
+                    driver.execute_script("arguments[0].click();", button)
+
+            except NoSuchElementException:
+                print("New button not found after clicking the scan button.")
+            except Exception as e:
+                print(f"Error processing new button: {e}")
 
         except NoSuchElementException:
             print("Product name or scan button not found in this card.")
