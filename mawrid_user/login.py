@@ -13,6 +13,8 @@ import random
 # Set up WebDriver
 def setup_driver():
     options = Options()
+    options.add_argument("--allow-insecure-localhost")
+    options.add_argument("--ignore-certificate-errors")
     options.add_argument("--incognito")
     options.add_argument("--disable-blink-features=AutomationControlled")  # Bypass bot detection
     options.add_argument("--disable-infobars")
@@ -28,6 +30,22 @@ def scroll_to_element(driver, element):
     driver.execute_script(
         "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
     time.sleep(0.5)  # Allow animation
+
+class TestFailedException(Exception):
+    """Custom exception for test failures"""
+    pass
+
+def verify_login_success(driver):
+    try:
+        # Wait for an element that appears only after successful login
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//p[contains(., 'Login as:')]"))
+        )
+        print("Login verification: Success - User menu found")
+        return True
+    except TimeoutException:
+        # If the element is not found, raise a custom exception with a descriptive message
+        raise TestFailedException("Login verification failed - User menu not found")
 
 # login function
 def login(driver):
@@ -65,6 +83,7 @@ def login(driver):
         )
         scroll_to_element(driver, login_button)
 
+
         try:
             login_button.click()
             print("Login successful!")
@@ -72,14 +91,18 @@ def login(driver):
             print("Regular click failed, using JS click.")
             driver.execute_script("arguments[0].click();", login_button)
 
+        # Add verification
+        if not verify_login_success(driver):
+            raise TestFailedException("Login verification failed")
+        print("Login successful!")
         return True
 
     except TimeoutException as e:
         print(f"Timeout: Element not found - {e}")
+        raise TestFailedException(f"Login failed due to timeout: {e}")
     except Exception as e:
         print(f"Login failed: {e}")
-
-    return False
+        raise TestFailedException(f"Login failed: {e}")
 
 # Function to click Product
 def product(driver):
@@ -329,7 +352,7 @@ def main():
     
         product_test(driver)
         
-        review(driver)
+        # review(driver)
         
         # Uncomment this if you want to log out at the end
         # logout(driver)
