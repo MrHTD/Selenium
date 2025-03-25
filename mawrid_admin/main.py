@@ -43,14 +43,14 @@ def login(driver):
             EC.visibility_of_element_located((By.XPATH, "//input[@type='identifier']"))
         )
         scroll_to_element(driver, email_field)
-        email_field.send_keys("james268@gmail.com")
+        email_field.send_keys("mawadmin@gmail.com")
 
         # Wait for the password input field
         password_field = WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, "//input[@type='password']"))
         )
         scroll_to_element(driver, password_field)
-        password_field.send_keys("123456")
+        password_field.send_keys("000012345")
 
         # Locate and click the login button
         login_button = WebDriverWait(driver, 10).until(
@@ -69,19 +69,34 @@ def login(driver):
         print(f"Timeout: Element not found - {e}")
     except Exception as e:
         print(f"Login failed: {e}")
+        
+# Check if the page is loaded properly after clicking a tab
+def check_page_status(driver):
+    try:
+        body_text = driver.find_element(By.TAG_NAME, "body").text
+        if "404" in body_text or "Page Not Found" in body_text:
+            print("404 Error: Page Not Found!")
+            return False
+        if not body_text.strip():
+            print("Error: The page loaded but is empty!")
+            return False
+        return True
+    except Exception as e:
+        print(f"Error while checking page status: {e}")
+        return False
 
 #sidebar Function
 def sidebar(driver):
     try:
         tabs = WebDriverWait(driver, 5).until(
-            EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, 'flex flex-row gap-3 items-center')]//span[contains(@class, 'flex py-3 px-3 items-center w-full h-full')]"))
+            EC.presence_of_all_elements_located((By.XPATH, "//a[contains(@class, 'flex items-center cursor-pointer')]//span[contains(@class, 'flex py-3 px-3 items-center w-full h-full')]"))
         )
     
         for index in range(len(tabs)):  # Avoid iterating stale elements
             try:
                 # Re-locate the elements to prevent StaleElementReferenceException
                 tabs = WebDriverWait(driver, 5).until(
-                    EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, 'flex flex-row gap-3 items-center')]//span[contains(@class, 'flex py-3 px-3 items-center w-full h-full')]"))
+                    EC.presence_of_all_elements_located((By.XPATH, "//a[contains(@class, 'flex items-center cursor-pointer')]//span[contains(@class, 'flex py-3 px-3 items-center w-full h-full')]"))
                 )
                 tab = tabs[index]
                 tab_name = tab.text.strip()
@@ -91,10 +106,17 @@ def sidebar(driver):
                         scroll_to_element(driver, tab)
                         ActionChains(driver).move_to_element(tab).pause(2).click().perform()
                         time.sleep(1)  # Slow down the clicks
+                        
+                        # Check if page loaded properly after clicking
+                        if not check_page_status(driver):
+                            print(f"Error: {tab_name} tab did not load correctly!")
+                            continue  # Skip to the next tab
+                        
+                        print(f"Clicked on Tab {index + 1}: {tab_name}")
+                        
                     except ElementClickInterceptedException:
                         driver.execute_script("arguments[0].click();", tab)  # Fallback JS click
 
-                    print(f"Clicked on Tab {index + 1}: {tab_name}")
                 else:
                     print(f"Tab {index + 1} ({tab_name}) is not visible, skipping.")
 
@@ -130,14 +152,14 @@ def logout(driver):
 # Main Function
 def main():
     driver = setup_driver()
-    driver.get("https://mawrid.vendor.devxonic.com")
+    driver.get("https://mawrid.admin.devxonic.com")
     
     try:    
         login(driver)
         
         sidebar(driver)
         
-        logout(driver)
+        # logout(driver)
 
     except Exception as e:
         print(f"Error encountered: {e}")
