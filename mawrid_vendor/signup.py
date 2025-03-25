@@ -129,6 +129,15 @@ def login(driver):
         except ElementNotInteractableException:
             print("Regular click failed, using JS click.")
             driver.execute_script("arguments[0].click();", signup)
+<<<<<<< HEAD
+=======
+        
+        # Add verification
+        if not verify_login_success(driver):
+            raise TestFailedException("Login verification failed")
+        print("Login successful!")
+        return True
+>>>>>>> a6d6082157f2e285df71bad9f59e4d3c6b108aa5
 
     except TimeoutException as e:
         print(f"Timeout: Element not found - {e}")
@@ -136,6 +145,7 @@ def login(driver):
     except Exception as e:
         print(f"Signup failed: {e}")
         raise TestFailedException(f"Signup failed: {e}")
+<<<<<<< HEAD
     
 def createstore(driver):
     try:
@@ -288,6 +298,9 @@ def createstore(driver):
 
     return False
         
+=======
+
+>>>>>>> a6d6082157f2e285df71bad9f59e4d3c6b108aa5
 
 # Logout Funtion
 def logout(driver):
@@ -325,6 +338,11 @@ def logout(driver):
     except Exception as e:
         print(f"Login failed: {e}")
 
+<<<<<<< HEAD
+=======
+    return False
+
+>>>>>>> a6d6082157f2e285df71bad9f59e4d3c6b108aa5
 
 # Main Function
 def main():
@@ -334,7 +352,15 @@ def main():
     try:    
         login(driver)
         
+<<<<<<< HEAD
         createstore(driver)
+=======
+        # WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        
+        
+        # Uncomment this if you want to log out at the end
+        # logout(driver)
+>>>>>>> a6d6082157f2e285df71bad9f59e4d3c6b108aa5
 
     except Exception as e:
         print(f"Error encountered: {e}")
