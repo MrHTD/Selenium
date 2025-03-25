@@ -1,0 +1,8 @@
+selenium>=4.16.0
+pytest>=8.0.0
+pytest-html>=3.2.0
+pytest-xdist>=3.5.0  # For parallel test execution
+webdriver-manager>=4.0.1
+python-dotenv>=1.0.0  # For environment variables
+pytest-rerunfailures>=12.0  # For retrying failed tests
+allure-pytest>=2.13.2  # For better reporting
